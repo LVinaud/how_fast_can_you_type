@@ -1,13 +1,14 @@
 # how_fast_can_you_type
 
-Authors:
-Lázaro Pereira Vinaud Neto
+### Authors:
+Bernardo Rodrigues Tameirão Santos
 Bruno Figueiredo Lima
+Lázaro Pereira Vinaud Neto
 
-Institution:
+### Institution:
 University of Sao Paulo, Institute Of Mathmetical and Computer Sciences
 
-Course:
+### Course:
 Practice in Computer Organization
 
 This is a repo for the course project, which envolves two tasks: First - finishing the cpu vhdl design of an authoral risk-v processor(https://github.com/simoesusp/Processador-ICMC) made by our professor and Second - creating an assembly code for a game in this same processor.
