@@ -36,7 +36,8 @@ The game is really simple:
 A text appears in the screen, the user need to type it and fast, the letters will change their colors considering what you typed, if you got a letter wrong, it becomes red and you need to go back, your time is your score, the faster the better. When you write things correctly, they become green. The code is througly commented.
 
 Screenshot of the game running:
-<img width="393" height="293" alt="image" src="https://github.com/user-attachments/assets/eb6892d0-6d14-490f-b796-8408163601c8" />
+<img width="1895" height="892" alt="image" src="https://github.com/user-attachments/assets/d39d3880-7620-41f4-9370-110df3f90709" />
+
 
 
 
