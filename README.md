@@ -25,7 +25,7 @@ After Claude did that we were a bit shocked, and that led us to try another thin
 
 Furthermore, both me and my friend, and also our professor started to philosophize about life, human work, even capitalism ability to continue. For us, it is clear that AI already has the capabilities to replace human work, not only theoretically, but it is only a matter of investing and organization. For me personally(Lazaro) manual labor is as easily replaceable, only a bit costlier since it also envolves building a robot, but is is possible and already exists, as in this chinese robot clip: https://www.reddit.com/r/interesting/comments/1tk8cgz/chinese_aipowered_robots_can_solve_workplace/ . 
 
-Sparing the reader of further philosophy, although we did that a lot in this semester, we decide to make this work 100% AI free, so our game was 100% made by humans, it is way simpler than an OS and this text is also 100% AI free. But we also decided to document this moment, which is kind of a huge breakthrough and a new era in our opinion(and even the pope's considering his recent encyclical "Magnifica Humanitas" that is related to the "Rerum Novarum" from the industrial revolution).
+Sparing the reader of further philosophy, although we did that a lot in this semester, we decided to make this work 100% AI free, so our game was 100% made by humans, it is way simpler than an OS and this text is also 100% AI free. But we also decided to document this moment, which is kind of a huge breakthrough and a new era in our opinion(and even the pope's considering his recent encyclical "Magnifica Humanitas" that is related to the "Rerum Novarum" from the industrial revolution).
 
 Considering that, there is a section with a video, prompts, and results from the whole Claude interaction, showing how little effort is needed to create intelectually hard tasks, and their amazing results.
 
@@ -34,5 +34,9 @@ Considering that, there is a section with a video, prompts, and results from the
 The game is really simple:
 
 A text appears in the screen, the user need to type it and fast, the letters will change their colors considering what you typed, if you got a letter wrong, it becomes red and you need to go back, your time is your score, the faster the better. When you write things correctly, they become green. The code is througly commented.
+
+Screenshot of the game running:
+<img width="393" height="293" alt="image" src="https://github.com/user-attachments/assets/eb6892d0-6d14-490f-b796-8408163601c8" />
+
 
 
