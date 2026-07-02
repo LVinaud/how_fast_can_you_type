@@ -54,3 +54,11 @@ The processor has been extended with two new instructions, both using the one-re
 |-----------|---------------------|-----------|
 | `RAND RX` | `110110` | `RX <- random number` |
 | `RDTIME RX` | `110111` | `RX <- time in milliseconds since startup` |
+
+### `RAND`
+
+The processor includes an internal counter (`Aleatorio`) that increments by 1 on every clock cycle. Since the program reads this counter at unpredictable moments (for example, when the player presses a key), the retrieved value serves as a random number. In the game, the `MOD` instruction is used to select one of the available phrases.
+
+### `RDTIME`
+
+The processor keeps track of elapsed time using a clock-cycle counter (`PreMili`). Every 12,000 clock cycles (equivalent to 1 ms with a 12 MHz clock), it increments a millisecond counter (`Milis`). The `RDTIME` instruction simply copies the value of this millisecond counter into the destination register. Dividing the resulting value by 1000 yields the elapsed time in seconds.
