@@ -31,8 +31,8 @@ Mascara: var #120
 
 ; Mensagens que serao impressas na tela
 ; tem que estar na forma: "/msg1/msg2/msg3"
-; pode ter no max 8 msg
-Frases: string "/po, faz esse esforco para a gente ai, ate quinta feira, que ai nao precisa nem ter bicho, entende, pra ganhar o jogo/se a gente nao ganhar do csa pelo amor de deus ne?/fala zeze, bom dia cara. deixa eu te falar uma coisa/e uma motivacao a mais pra gente cara, acertar o salario ai/ai voce nao precisa arrumar uma premiacao para ganhar o jogo, porque a nossa obrigacao e ganhar esse jogo! ta louco!"
+; pode ter no max 7 msg
+Frases: string "/fala, zeze. bom dia, cara.deixa eu te falar uma coisa./eu estou pensando aqui, sei que esta dificil para voces ai arrumarem recursos, sei que esta correndo atras/ve se voce nao consegue pelo menos pagar esses outros sessenta por cento dos salarios atrasados antes do jogo de quinta/que ai nao precisa nem ter bicho, entendeu, para ganhar jogo./e uma motivacao a mais para a gente, cara, acertar o salario ai/ai voce nao precisa arrumar uma premiacao para ganhar/ta louco. se a gente nao ganhar do csa, pelo amor de deus/po, faz esse esforco para a gente ai, ate quinta feira"
 
 
 main:
@@ -202,9 +202,9 @@ SorteioFrase: ; vai salvar em FraseEscolhida a frase sorteada
     ; Antes: liamos um numero de uma tabela fixa (Rand + IncRand).
     ; Agora: pedimos um numero aleatorio ao hardware e tiramos o resto por 8.
     rand r3           ; r3 <- numero aleatorio do processador
-    loadn r1, #8
-    mod r3, r3, r1    ; r3 <- 0..7
-    inc r3            ; r3 <- 1..8 (numero da frase que vamos pegar)
+    loadn r1, #7
+    mod r3, r3, r1    ; r3 <- 0..6
+    inc r3            ; r3 <- 1..7 (numero da frase que vamos pegar)
 
     ; vou ler r3 '/'s na minha Frases, e pego a string logo em sequencia
     ; salvo no buffer em FraseEscolhida
