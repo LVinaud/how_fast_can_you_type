@@ -63,4 +63,8 @@ The processor includes an internal counter (`Aleatorio`) that increments by 1 on
 
 The processor keeps track of elapsed time using a clock-cycle counter (`PreMili`). Every 12,000 clock cycles (equivalent to 1 ms with a 12 MHz clock), it increments a millisecond counter (`Milis`). The `RDTIME` instruction simply copies the value of this millisecond counter into the destination register. Dividing the resulting value by 1000 gets the elapsed time in seconds.
 
+# Video
+
+https://youtu.be/Pr4p5k__1ZM
+
 
