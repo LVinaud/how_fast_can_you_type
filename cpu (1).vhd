@@ -68,6 +68,7 @@ ARCHITECTURE main of cpu is
 	CONSTANT DIV 			: STD_LOGIC_VECTOR(3 downto 0) := "0011";			-- DIV RX RY RZ 							-- RX <- RY / RZ / RX <- RY / RZ + C  	-- b0=CarRY				Format: < inst(6) | RX(3) | RY(3) | RZ(3)| C >
 	CONSTANT INC 			: STD_LOGIC_VECTOR(3 downto 0) := "0100";			-- INC RX / DEC RX						-- RX <- RX + 1 / RX <- RX - 1  			-- b6= INC/DEC : 0/1	Format: < inst(6) | RX(3) | b6 | xxxxxx >
 	CONSTANT LMOD 			: STD_LOGIC_VECTOR(3 downto 0) := "0101";			-- MOD RX RY RZ 							-- RX <- RY MOD RZ														Format: < inst(6) | RX(3) | RY(3) | RZ(3)| x >	
+  	CONSTANT RAND       : STD_LOGIC_VECTOR(3 downto 0) := "0110";    			-- RAND RX                    		-- RX <- seed
 
 	CONSTANT LOGIC			: STD_LOGIC_VECTOR(1 downto 0) := "01";
 	-- LOGIC Instructions (All should begin wiht "01"):	
@@ -110,7 +111,7 @@ ARCHITECTURE main of cpu is
 	signal x, y, result	: STD_LOGIC_VECTOR(15 downto 0);
 	signal FR				: STD_LOGIC_VECTOR(15 downto 0);	-- Flag Register: <...DIVbyZero|StackUnderflow|StackOverflow|DIVByZero|ARITHmeticOverflow|carRY|zero|equal|lesser|greater>
 	signal auxFR			: STD_LOGIC_VECTOR(15 downto 0);	-- Representa um barramento conectando a ULA ao Mux6 para escrever no FR
-
+  	signal seed_reg : std_logic_vector(15 downto 0) := x"ACE1"; -- Registrador que guarda a seed
 
 begin
 
@@ -154,8 +155,9 @@ process(clk, reset)
 	variable RX : integer;   
 	variable RY : integer;
 	variable RZ : integer;
-	
-	
+  
+  	variable counter : unsigned(31 downto 0) := (others => '0'); -- Contador que auxilia a seed
+
 begin
 
 	if(reset = '1') then
@@ -209,6 +211,9 @@ begin
 
 		 -- Novo na Versao 3
 		HALT_ack <= '0';
+
+		-- Reseta a seed para o valor do contador
+		seed_reg <= counter(15 downto 0);
 			
 	elsif(clk'event and clk = '1') then
 	
@@ -274,6 +279,9 @@ begin
 		videoflag <= '0';	-- Abaixa o sinal para a "Placa de Video" : sobe a cada OUTCHAR
 
 		RW <= '0';  -- Sinal de Letura/Ecrita da mem ria em Leitura  (0 - ler, 1 - escrever)
+
+		seed_reg <= seed_reg(14 downto 0) & feedback; -- Muda o valor da seed
+		counter := counter + 1 -- Incrementa o contador
 
 		-- Novo na Versao 3
 		if(halt_req = '1') then state := halted; end if;
@@ -833,6 +841,10 @@ BEGIN
 						AUX := CONV_STD_LOGIC_VECTOR(CONV_INTEGER(X) mod CONV_INTEGER(Y), 16);		
 						auxFR(6) <= '0';
 					END IF;			
+
+				WHEN RAND =>
+					AUX <= seed_reg
+
 				WHEN others =>   -- invalid operation, defaults to nothing
 					AUX := X;
 			END CASE;
