@@ -1,0 +1,102 @@
+# Prompt para o Claude Code — Processador ICMC (SSC0119)
+
+> Cole o texto abaixo (a partir de "INÍCIO DO PROMPT") no Claude Code.
+> Ele está estruturado em fases com "portões": o Claude Code deve **entender antes de mexer** e não deve avançar de fase sem te mostrar o resultado da fase anterior.
+
+---
+
+## INÍCIO DO PROMPT
+
+Você vai trabalhar no processador didático **ICMC** da disciplina SSC0119 (Prática em Organização de Computadores, ICMC-USP). Trabalhe em **português** nos comentários e nas explicações. Siga as fases **em ordem** e **pare no fim de cada fase para eu revisar** antes de continuar. Não pule o entendimento da arquitetura: só edite VHDL depois de me apresentar o resumo da Fase 1.
+
+### Regras gerais (valem para tudo)
+- **Não quebre o que já funciona.** Vários blocos de instrução no `cpu.vhd` já estão implementados e servem de referência/gabarito de estilo — não os altere, apenas espelhe o padrão deles.
+- Preserve o **estilo do código existente** (mesma indentação, mesmos nomes de sinais, mesmos comentários em português).
+- Antes de qualquer commit ou alteração, explique **o que** vai mudar e **por quê**, ligando à documentação da arquitetura.
+- Nunca invente opcode, formato de instrução ou nome de sinal: tudo tem que sair das constantes/comentários do próprio `cpu.vhd` ou do manual (`Manual/ProcessadorICMC2.pdf`).
+
+---
+
+### FASE 0 — Setup do ambiente
+1. Clone o repositório: `git clone https://github.com/simoesusp/Processador-ICMC.git`
+2. **Atenção:** o processador desta tarefa fica em `FPGA_PROC_RGB8/`, mas o `cpu.vhd` **não está solto** — ele está **dentro de `FPGA_PROC_RGB8/DE0_CV.zip`**, no caminho `DE0_CV/cpu.vhd`. Extraia o zip (ex.: para `FPGA_PROC_RGB8/DE0_CV/`) e trabalhe sobre `DE0_CV/cpu.vhd`. Faça um backup antes de editar (`cp cpu.vhd cpu_original.vhd`).
+3. Liste todos os `.vhd` extraídos (cpu, RAM, TEXT_DRAWER, color_bridge, ASCII_CONV, POS_CONV, vga_sync, etc.) e me diga, em uma linha cada, o papel de cada um no sistema.
+4. **Portão 0:** me mostre a árvore de arquivos e onde está o `cpu.vhd`. Não avance sem confirmação.
+
+---
+
+### FASE 1 — Entender a arquitetura ANTES de mexer
+Leia e resuma (não implemente nada ainda):
+1. O **cabeçalho do `cpu.vhd`**: todas as constantes de opcode (`LOAD`, `STORE`, `LOADIMED`, `LOADINDEX`, `STOREINDEX`, `MOV`, `OUTCHAR`, `INCHAR`, `ARITH`/`ADD`/`SUB`/`MULT`/`DIV`/`INC`/`LMOD`, `LOGIC`/`LAND`/`LOR`/`LXOR`/`LNOT`/`SHIFT`/`CMP`, `JMP`, `CALL`, `RTS`, `PUSH`, `POP`, `NOP`, `HALT`, `SETC`, `BREAKP`) e o **formato de bits** de cada uma (documentado nos comentários ao lado de cada constante).
+2. A **máquina de estados**: `fetch → decode → exec → exec2 → halted`. Explique o que cada estado faz e como o `state :=` transita.
+3. Os **sinais de controle** e o bloco no topo do processo que **zera todos os sinais por padrão** a cada ciclo ("a última atribuição é a que vale"). Explique por que quase toda instrução só precisa **ligar** os sinais que usa.
+4. O **banco de registradores** (`Reg(0..7)`), o `PC`, o `SP`, o `IR`, o **Flag Register `FR`** (e o significado de cada bit: greater/lesser/equal/zero/carry/overflow/... conforme os comentários) e o **processo da ULA** no fim do arquivo (entradas `OP, X, Y`, saída e como o `FR` é atualizado).
+5. O padrão de **memória**: sinais `M1` (endereço), `Mem` (dado lido), `RW` (0=lê, 1=escreve), e como `LOAD`/`STORE` usam os estados `exec`.
+6. Estude os blocos **JÁ IMPLEMENTADOS** para usar como gabarito de estilo: `OUTCHAR`, `INCHAR`, `LOADIMED`, `LOAD` (decode), `STORE` (decode), `SHIFT` (completo), `JMP` (completo, com todas as condições), `NOP`, `HALT`, `SETC`, `BREAKP`.
+
+**Portão 1:** Escreva um resumo (`ARQUITETURA_RESUMO.md`) com: tabela de instruções (mnemônico, opcode, formato, ação), diagrama textual da FSM, lista dos sinais de controle e bits do FR. **Pare e me mostre.** Não edite `cpu.vhd` antes da minha aprovação.
+
+---
+
+### FASE 1b — Completar as instruções faltantes no `cpu.vhd`
+Somente após o Portão 1. Nesta versão didática, vários blocos têm o `IF(IR(...) = OPCODE) THEN` presente mas o **corpo vazio** (só com `state := fetch;`). Complete **apenas** os blocos abaixo, um de cada vez, testando entre eles:
+
+**No estado `decode`:**
+- `LOADINDEX` (LOADI RX RY → `RX <- M[RY]`)
+- `STOREINDEX` (STOREI RX RY → `M[RX] <- RY`)
+- `MOV` nas 3 variantes: `MOV RX RY`, `MOV RX SP`, `MOV SP RX` (o formato distingue pelos 2 bits menos significativos)
+- `ARITH` (bloco geral `ADD`/`SUB`/`MULT`/`DIV`/`LMOD`, exceto INC) — deve **acionar a ULA** com o `OP` correto e carregar `RX`
+- `INC/DEC` (mesmo opcode ARITH, subcaso INC; bit 6 decide INC vs DEC)
+- `LOGIC` (bloco geral `AND`/`OR`/`XOR`/`NOT`, exceto SHIFT e CMP) — via ULA
+- `CMP` (compara `RX` e `RY` e atualiza o `FR`; **não** escreve em registrador)
+- `CALL` (empilha PC e desvia condicionalmente — reaproveite a mesma lógica de condições `b9..b6` do `JMP`, que já está pronta)
+- `PUSH` (RX ou FR: `M[SP] <- valor; SP--`; bit 6 decide RX vs FR)
+- `POP` (`SP++; RX/FR <- M[SP]`; bit 6 decide RX vs FR)
+
+**No estado `exec`:** complete o corpo de `LOAD`, `STORE`, `CALL`, `RTS`, `POP` (leituras/escritas em memória e transições para `exec2`/`fetch` conforme necessário).
+
+**No estado `exec2`:** complete `RTS`.
+
+Diretrizes obrigatórias ao implementar:
+- Para operações da ULA, **não recalcule a aritmética "na mão"** dentro do decode: direcione operandos para a ULA (sinais `OP`, `X`, `Y`) exatamente como o restante do processador espera, e deixe a ULA atualizar o `FR`. Confirme isso lendo o processo da ULA.
+- Respeite a semântica do `SP` (a pilha cresce para baixo: `PUSH` faz `DecSP`, `POP` faz `IncSP` — **verifique a direção** lendo os comentários, não presuma).
+- Use `LoadReg(RX) := '1'` para escrever em registrador, `selM2`/`selM6` para selecionar fontes, e **só ligue** os sinais necessários (o default já zerou tudo).
+- Para cada bloco, escreva um comentário curto em português explicando a micro-operação.
+
+**Verificação da Fase 1b:**
+- Se houver GHDL disponível, faça `ghdl -a cpu.vhd` (e dependências) para checar sintaxe/elaboração. Se não houver, tente instalar; se não der, apenas garanta que o VHDL está sintaticamente coerente e me avise que a checagem de compilação precisa ser feita no Quartus.
+- Use `Software_Assembly/TesteCPU.asm` (e o `.mif` correspondente) como programa de teste conceitual: explique, instrução por instrução, qual resultado esperado cada uma produz nos registradores/memória com a sua implementação.
+- Para teste funcional real, indique como validar no **goICMCsim** (`https://github.com/lucasgpulcinelli/goICMCsim/releases`) ou no simulador online, e no **Quartus** para a placa DE0-CV. (Você não tem a placa aqui; deixe o passo do Quartus documentado para eu executar.)
+
+**Portão 1b:** me mostre o `diff` do `cpu.vhd`, bloco a bloco, com a justificativa de cada micro-operação. **Pare.**
+
+---
+
+### FASE 2 — Jogo em Assembly para a arquitetura ICMC
+Somente após eu aprovar a Fase 1b.
+
+Contexto da plataforma (confirme lendo `FPGA_PROC_RGB8/README.md` e `Manual/ProcessadorICMC2.pdf`):
+- **Tela**: 40 colunas × 30 linhas = **1200 posições** (índice contínuo 0..1199), escrita com `OUTCHAR RX, RY` (RX = caractere+cor, RY = posição).
+- **Cor RGB8** (16 bits por caractere): bits 7–0 = código ASCII; bits 9–8 = Blue (4 níveis); bits 12–10 = Green (8 níveis); bits 15–13 = Red (8 níveis). Some o offset de cor ao código ASCII para colorir (o README tem exemplos numéricos).
+- **Teclado**: `INCHAR RX` lê a tecla (retorna `0x00FF` se nada pressionado).
+- Diretivas de montagem: `var`, `string`, `loadn`, `store`, `storei`, `loadi`, `inc`, `dec`, `call`, `jmp`, `push`, `pop` etc. (veja os exemplos).
+
+Passos:
+1. Estude os **jogos de exemplo** da disciplina em `Software_Assembly/` como base: `snake.asm` (670 linhas — ótima referência de loop principal, desenho, colisão, comida, teclado), `Nave11-giroto.asm`, `Forca.asm`, `keepitsimple.asm` (mínimo, bom para começar) e o `ICMC_WARS-master/`. Aproveite o **`Dicas de Jogos2.txt`**.
+2. Me proponha **2 ou 3 ideias de jogo** simples e viáveis (ex.: Pong, Breakout, um coletor tipo Snake simplificado, Space Invaders reduzido), com escopo realista para a tela 40×30 e o set de instruções. **Pare e deixe eu escolher.**
+3. Implemente o jogo escolhido em um `.asm`, reaproveitando padrões dos exemplos (rotina de `Delay`, `Draw`, leitura de teclado, `push/pop` para preservar registradores em subrotinas). Comente o código em português.
+4. **Monte e teste**: use o montador em `NovoMontadorLinux/` (há binário e fontes) para gerar o `.mif`; se não montar no ambiente, gere o `.asm` limpo e documente o comando exato de montagem + como carregar no goICMCsim. Descreva o resultado esperado.
+5. Entregue o `.asm` comentado + instruções de como montar/simular e, se eu quiser rodar na FPGA, o passo de renomear o `.mif` para `CPURAM.MIF` e compilar no Quartus (conforme o README do repositório).
+
+**Portão 2:** entregue o jogo, o resumo do que foi feito e como testar.
+
+---
+
+### Checklist final de entrega
+- [ ] `ARQUITETURA_RESUMO.md` (Fase 1)
+- [ ] `cpu.vhd` com todas as instruções faltantes completas, sem alterar os blocos que já funcionavam
+- [ ] Diff comentado + explicação de cada micro-operação
+- [ ] Programa/roteiro de teste do processador
+- [ ] Jogo em `.asm` comentado + instruções de montagem e simulação
+
+## FIM DO PROMPT
