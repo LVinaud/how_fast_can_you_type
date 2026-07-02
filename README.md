@@ -30,7 +30,7 @@ Furthermore, both me and my friend, and also our professor started to philosophi
 
 Sparing the reader of further philosophy, although we did that a lot in this semester, we decided to make this work 100% AI free, so our game was 100% made by humans, it is way simpler than an OS and this text is also 100% AI free. But we also decided to document this moment, which is kind of a huge breakthrough and a new era in our opinion(and even the pope's considering his recent encyclical "Magnifica Humanitas" that is related to the "Rerum Novarum" from the industrial revolution).
 
-Considering that, there is a section with a video, prompts, and results from the whole Claude interaction, showing how little effort is needed to create intelectually hard tasks, and their amazing results.
+Considering that, there is a folder with prompts, and results from the whole Claude interaction, showing how little effort is needed to create intelectually hard tasks, and their amazing results. A original prompt was made to browser Claude asking him to create a more optimized prompt for the Claude Code to actually do the whole thing, and then some games it generated from that and the cpu.vhd.
 
 # Our Game
 
