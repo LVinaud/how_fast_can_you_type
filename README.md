@@ -41,3 +41,16 @@ A text appears in the screen, the user need to type it and fast, the letters wil
 Screenshot of the game running:
 
 <img width="1895" height="892" alt="image" src="https://github.com/user-attachments/assets/d39d3880-7620-41f4-9370-110df3f90709" />
+
+# Architecture ADD-Ons
+
+As part of the course, we are also tasked to implement a new instruction, make the assembler recognize it, and use the new instruction in our game. Since we use random numbers a lot to choose the new sequence of words, we decided to implement and use that.
+
+## Architecture Modification: `RAND` and `RDTIME` Instructions
+
+The processor has been extended with two new instructions, both using the one-register format (the same as `INCHAR`):
+
+| Mnemonic | Opcode `IR(15..10)` | Operation |
+|-----------|---------------------|-----------|
+| `RAND RX` | `110110` | `RX <- random number` |
+| `RDTIME RX` | `110111` | `RX <- time in milliseconds since startup` |
