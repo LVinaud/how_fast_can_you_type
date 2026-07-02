@@ -44,7 +44,7 @@ Screenshot of the game running:
 
 # Architecture ADD-Ons
 
-As part of the course, we are also tasked to implement a new instruction, make the assembler recognize it, and use the new instruction in our game. Since we use random numbers a lot to choose the new sequence of words, we decided to implement and use that.
+As part of the course, we are also tasked to implement a new instruction, make the assembler recognize it, and use the new instruction in our game. Since we use random numbers a lot to choose the new sequence of words, we decided to implement and use that and also an instructions to see how much time has passed since the computer started. The game code, cpu.vhd and assembler are all in the version_with_added_instructions folder.
 
 ## Architecture Modification: `RAND` and `RDTIME` Instructions
 
@@ -62,3 +62,5 @@ The processor includes an internal counter (`Aleatorio`) that increments by 1 on
 ### `RDTIME`
 
 The processor keeps track of elapsed time using a clock-cycle counter (`PreMili`). Every 12,000 clock cycles (equivalent to 1 ms with a 12 MHz clock), it increments a millisecond counter (`Milis`). The `RDTIME` instruction simply copies the value of this millisecond counter into the destination register. Dividing the resulting value by 1000 yields the elapsed time in seconds.
+
+
